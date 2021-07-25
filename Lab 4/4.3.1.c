@@ -17,6 +17,9 @@ const unsigned long periodThreeLEDs = 500;
 enum BL_States { BL_SMStart, BL_s1 };
 int TickFct_BlinkLED(int state);
 
+int TickFct_Sort(task tasks);
+int Swap(task tasks1, task tasks2)
+
 int TickFct_ThreeLEDs(int state);
 enum TL_States { TL_SMStart, TL_s1, TL_s2, TL_s3 };
 
@@ -31,8 +34,16 @@ void TimerISR() {
   }
 }
 
+
+
 int main() {
   unsigned char i=0;
+   bool Swapped;
+   int cnt;
+   int numtasks;
+   numtasks = tasksnum;
+   Swapped = true;
+
   tasks[i].state = BL_SMStart;
   tasks[i].period = periodBlinkLED;
   tasks[i].elapsedTime = tasks[i].period;
@@ -42,12 +53,31 @@ int main() {
   tasks[i].period = periodThreeLEDs;
   tasks[i].elapsedTime = tasks[i].period;
   tasks[i].TickFct = &TickFct_ThreeLEDs;
+   
+   while (Swapped == true) {
+      Swapped = false;
+      cnt = 0;
+      
+      while (cnt+1 < numtasks) {
+         printf("%d", tasks[cnt].period);
+         printf("%d", tasks[cnt+1].period);
+         if (tasks[cnt] > tasks[cnt+1]) {
+               tasks[cnt], tasks[cnt+1] = Swap(task tasks[cnt], task tasks[cnt+1]);
+               Swapped = True;
+         }
+         cnt = cnt + 1;
+      
+      }
+      numtasks = numtasks - 1
+   }
+  
 
   TimerSet(tasksPeriodGCD);
   TimerOn();
-  
+
+
   while(1) {
-     
+     Sleep();
   }
   return 0;
 }
@@ -107,4 +137,12 @@ int TickFct_ThreeLEDs(int state) {
         break;
   } // State actions
   return state;
+}
+
+int Swap(task tasks1, task tasks2){
+   task temp;
+   temp = tasks1;
+   tasks1 = tasks2;
+   tasks2 = temp;
+   return(tasks1, tasks2)
 }
